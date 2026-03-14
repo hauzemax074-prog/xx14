@@ -818,13 +818,41 @@ document.addEventListener('mousemove', function(e) {
     }
 });
 
-    async function downloadPDF() {
+async function downloadPDF() {
+    try {
         const bytes = await processPDF();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(new Blob([bytes], {type: 'application/pdf'}));
-        link.download = "Gewerbeanmeldung.pdf";
-        link.click();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        // Prüfen, ob der Nutzer ein iPhone oder iPad nutzt
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (isIOS) {
+            // Am iPhone: In neuem Tab öffnen
+            // Der Nutzer kann es dann über das "Teilen"-Icon (Viereck mit Pfeil) speichern
+            const newTab = window.open(url, '_blank');
+            if (!newTab) {
+                // Falls Pop-up geblockt wurde, im selben Fenster öffnen
+                window.location.href = url;
+            }
+        } else {
+            // Am PC oder Samsung: Direkter Download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "Gewerbeanmeldung.pdf";
+            document.body.appendChild(link); // Wichtig für manche Browser
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Cleanup: URL nach einer Weile freigeben
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        
+    } catch (err) {
+        alert("Fehler beim Speichern: " + err.message);
     }
+}
 </script>
 </body>
 </html>
