@@ -32,11 +32,14 @@
         height: 100%;        /* Nutzt die 500px der preview-area */
     }
 
-    .btn-container {
-        position: relative;  /* Damit die Buttons im Fluss der Seite bleiben */
-        bottom: 0;
-        padding: 20px 0;
-    }
+.btn-container {
+    background: var(--sidebar-bg);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 2px solid #455a64;
+}
 }
 
         iframe {
@@ -282,11 +285,13 @@
     </div>
 </div>
             <div class="form-group"><label>Feld 32: Datum</label><input type="text" id="f32" placeholder="Ort, Datum"></div>
-        <div class="btn-container">
-            <button class="btn btn-orange" onclick="updatePreview()">Vorschau aktualisieren</button>
-            <button class="btn btn-green" onclick="downloadPDF()">Als PDF speichern</button>
-        </div>
+      <div id="buttonWrapper" style="display:none;">
+    <div class="btn-container">
+        <button class="btn btn-orange" onclick="updatePreview()">Vorschau aktualisieren</button>
+        <button class="btn btn-blue" onclick="openInNewTab()">Vollbild / iPhone Fix</button>
+        <button class="btn btn-green" onclick="downloadPDF()">Als PDF speichern</button>
     </div>
+</div>
 </div>
 
 <div class="preview-area">
@@ -314,19 +319,21 @@ window.onload = async () => {
             bytes[i] = binaryString.charCodeAt(i);
         }
         
-        // Die globale Variable füllen, die processPDF() benutzt
-        pdfDocBase = bytes.buffer;
+pdfDocBase = bytes.buffer;
 
-        // UI umschalten (Upload-Box weg, Formular her)
+        // UI umschalten
         document.getElementById('upload-section').style.display = 'none';
         document.getElementById('mainForm').style.display = 'block';
+        
+        // DIESE ZEILE FEHLT NOCH:
+        document.getElementById('buttonWrapper').style.display = 'block'; 
         
         // Die Vorschau sofort das erste Mal rendern
         updatePreview();
         
         console.log("Fertig! PDF ist im Speicher.");
     } catch (err) {
-        console.error("Fehler beim Dekodieren der PDF:", err);
+        console.error("Fehler beim Laden:", err);
     }
 };
 
