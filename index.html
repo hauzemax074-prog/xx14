@@ -435,13 +435,33 @@ const X_IMAGE_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfkAAAHLCA
 // Öffnet das PDF in einem neuen Tab (Wichtig für iPhone/Android)
 async function openInNewTab() {
     if (!pdfDocBase) {
-        alert("Bitte zuerst eine Vorlage laden!");
+        alert("Fehler: PDF-Vorlage konnte nicht gefunden werden.");
         return;
     }
-    const bytes = await processPDF();
-    const blob = new Blob([bytes], {type: 'application/pdf'});
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
+
+    try {
+        // 1. PDF generieren
+        const bytes = await processPDF();
+        
+        // 2. Blob erstellen
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        // 3. Der Handy-Trick: 
+        // Wir versuchen das Fenster direkt zu öffnen.
+        const newTab = window.open(url, '_blank');
+        
+        // 4. Falls der Browser es trotzdem blockiert hat (Popup-Blocker)
+        if (!newTab || newTab.closed || typeof newTab.closed == 'undefined') {
+            // Fallback: Wir leiten den aktuellen Iframe um oder zeigen einen Link
+            alert("Hinweis: Bitte erlauben Sie Pop-ups für diese Seite, um die Vollbild-Ansicht zu nutzen.");
+            // Optional: Im selben Fenster öffnen, falls Pop-up fehlschlägt
+            // window.location.href = url; 
+        }
+    } catch (err) {
+        console.error("Fehler beim Öffnen:", err);
+        alert("Die PDF konnte nicht erstellt werden.");
+    }
 }
 
 // Prüft beim Laden, ob wir auf einem Handy sind und zeigt den Extra-Button
