@@ -98,34 +98,49 @@
 }
 
 /* NAVIGATION FIX FÜR HANDY */
-/* Navigation für Handy fixieren */
 @media (max-width: 800px) {
+    /* WICHTIG: Den Body auf Block umstellen, damit Flexbox am Handy nicht stört */
+    body {
+        display: block !important;
+        overflow-y: auto !important;
+        height: auto !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        padding-bottom: 250px !important; /* Platz für die schwebenden Buttons */
+    }
+
     .btn-container {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
         background: #2c3e50 !important;
-        padding: 10px !important;
-        /* NEU: Verhindert, dass das iOS-Menü die Buttons überdeckt */
-        padding-bottom: env(safe-area-inset-bottom) !important; 
+        padding: 15px !important;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important; 
         display: flex !important;
         flex-direction: column !important;
-        gap: 8px !important;
-        z-index: 10000 !important;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        gap: 10px !important;
+        /* Die Rettung: */
+        z-index: 99999 !important; 
+        pointer-events: auto !important; 
+        box-shadow: 0 -10px 25px rgba(0,0,0,0.6);
     }
 
     .btn {
-        display: block !important; /* Sicherstellen, dass sie nicht versteckt sind */
+        display: block !important;
         width: 100% !important;
-        padding: 15px !important;
-        font-size: 0.9rem !important;
+        padding: 16px !important; /* Etwas größer für dicke Daumen */
+        font-size: 1rem !important;
+        pointer-events: auto !important; /* Klicks erzwingen */
     }
 
-    /* Platzhalter am Ende des Formulars erhöhen */
-    #mainForm {
-        padding-bottom: 200px !important; 
+    .preview-area {
+        width: 100% !important;
+        height: 500px !important; /* Feste Höhe am Handy, sonst sieht man nix */
+        padding: 10px !important;
+        box-sizing: border-box !important;
     }
 }
 
