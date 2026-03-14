@@ -467,22 +467,17 @@ function limitToPDFSpace(el) {
     }
 }
 async function processPDF() {
-    const { PDFDocument, rgb } = PDFLib; // StandardFonts wird hier nicht gebraucht, wenn du eigene Schrift nutzt
+    const { PDFDocument, StandardFonts, rgb } = PDFLib;
     
-    // 1. PDF laden (aus deiner pdfDocBase Variable)
+    // 1. PDF laden
     const pdfDoc = await PDFDocument.load(pdfDocBase);
     const page = pdfDoc.getPages()[0];
 
-    // 2. EIGENE SCHRIFT laden (Base64 zu Uint8Array)
-    // Ersetze MY_FONT_BASE64 mit deinem langen Schrift-String
-    const fontRaw = window.atob(MY_FONT_BASE64.split(',')[1] || MY_FONT_BASE64);
-    const fontUint8 = new Uint8Array(fontRaw.length);
-    for (let i = 0; i < fontRaw.length; i++) {
-        fontUint8[i] = fontRaw.charCodeAt(i);
-    }
-    const customFont = await pdfDoc.embedFont(fontUint8);
+    // 2. Schrift laden (Helvetica)
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    // 3. Das "X" laden (Bleibt wie gehabt)
+    // 3. Das "X" (Kreuz) für Checkboxen laden
+    // Wir wandeln den Base64-String direkt um, statt fetch zu nutzen
     const xImageRaw = window.atob(X_IMAGE_BASE64.split(',')[1] || X_IMAGE_BASE64);
     const xUint8 = new Uint8Array(xImageRaw.length);
     for (let i = 0; i < xImageRaw.length; i++) {
@@ -490,17 +485,22 @@ async function processPDF() {
     }
     const xImage = await pdfDoc.embedPng(xUint8);
 
-    // 4. Hilfsfunktion für Uploads (Unterschrift/Stempel)
+    // 4. Hilfsfunktion für Bild-Uploads (Stempel & Unterschrift)
     const embedUploadImage = async (inputId) => {
         const fileInput = document.getElementById(inputId);
         if (fileInput && fileInput.files.length > 0) {
             try {
                 const file = fileInput.files[0];
                 const arrayBuffer = await file.arrayBuffer();
-                return (file.type === "image/jpeg" || file.type === "image/jpg") 
-                    ? await pdfDoc.embedJpg(arrayBuffer) 
-                    : await pdfDoc.embedPng(arrayBuffer);
-            } catch (e) { console.error("Bild-Fehler", e); }
+                // WICHTIG: Prüfe ob es PNG oder JPG ist
+                if (file.type === "image/jpeg" || file.type === "image/jpg") {
+                    return await pdfDoc.embedJpg(arrayBuffer);
+                } else {
+                    return await pdfDoc.embedPng(arrayBuffer);
+                }
+            } catch (e) {
+                console.error("Bild-Fehler bei " + inputId, e);
+            }
         }
         return null;
     };
