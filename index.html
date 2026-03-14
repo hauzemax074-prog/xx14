@@ -253,7 +253,7 @@
     <textarea 
     id="f15" 
     oninput="limitToPDFSpace(this)" 
-    style="width: 100%; max-width: 535px; font-family: Helvetica, Arial; font-size: 10pt;"
+    style="width: 100%; max-width: 750px; font-family: Helvetica, Arial; font-size: 10pt;"
 ></textarea>
 </div>
             <div class="row">
@@ -481,7 +481,7 @@ function limitToPDFSpace(el) {
     const ctx = canvas.getContext('2d');
     ctx.font = "10pt Helvetica"; 
 
-    const maxW1 = 20; // Maximale Breite der einen Zeile
+    const maxW1 = 720; // Maximale Breite der einen Zeile
     
     const words = el.value.replace(/\n/g, ' ').split(' ');
     let currentLine = "";
@@ -676,7 +676,7 @@ drawText('f6', 106, 596, 15.1);
         const fontSize = 10;
         const startX1 = 32.5; 
         const currentY = 362; 
-        const maxWidthLine1 = 720; 
+        const maxWidthLine1 = 920; 
 
         // Text in Wörter zerlegen
         const words = f15El.value.replace(/\s+/g, ' ').trim().split(' ');
